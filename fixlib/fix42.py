@@ -197,9 +197,9 @@ WENUMS = {
 }
 
 RENUMS = {}
-for tag, vals in WENUMS.iteritems():
+for tag, vals in WENUMS.items():
 	cur = RENUMS.setdefault(tag, {})
-	for k, v in vals.iteritems():
+	for k, v in vals.items():
 		cur[v] = k
 
 RTAGS = {
@@ -338,7 +338,7 @@ RTAGS = {
 	1027: ('MDEntrySpotPoints', float),
 }
 
-WTAGS = dict((v[0], (k, v[1])) for (k, v) in RTAGS.iteritems())
+WTAGS = dict((v[0], (k, v[1])) for (k, v) in RTAGS.items())
 
 def booldecode(x):
 	return {'Y': True, 'N': False}[x]
@@ -372,7 +372,7 @@ TYPES = {
 	str: (str, str),
 	int: (str, int),
 	float: (str, float),
-	long: (str, int),
+	int: (str, int),
 	date: (dencode, ddecode),
 	datetime: (dtencode, dtdecode),
 	list: (lambda x: ' '.join(x), lambda x: x.split(' ')),
@@ -417,7 +417,7 @@ def format(k, v):
 		else:
 			v = WENUMS[k][v]
 	
-	if type(v) == unicode:
+	if type(v) == str:
 		v = v.encode('utf-8')
 	
 	v = TYPES[type(v)][0](v)
@@ -452,7 +452,7 @@ def construct(msg):
 		if k in msg:
 			body.append(format(k, msg.pop(k)))
 	
-	for k, v in sorted(msg.iteritems()):
+	for k, v in sorted(msg.items()):
 		tags(body, k, v)
 	
 	body = SOH.join(body) + SOH

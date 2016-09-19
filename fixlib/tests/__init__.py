@@ -4,8 +4,8 @@
 # This software is licensed as described in the file LICENSE,
 # which you should have received as part of this distribution.
 
-from basic import BasicTests
-from flow import EngineTests
+from .basic import BasicTests
+from .flow import EngineTests
 import unittest
 
 def suite():

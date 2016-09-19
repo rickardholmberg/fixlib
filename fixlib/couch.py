@@ -4,7 +4,7 @@
 # This software is licensed as described in the file LICENSE,
 # which you should have received as part of this distribution.
 
-import fix42, util
+from . import fix42, util
 import couchdb
 import copy
 

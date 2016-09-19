@@ -6,7 +6,7 @@
 
 from datetime import datetime, date
 
-import fix42
+from . import fix42
 import copy
 
 def ddecode(s):
@@ -22,7 +22,7 @@ TYPES = {
 
 def json_encode(msg):
 	msg = copy.copy(msg)
-	for k, v in msg.iteritems():
+	for k, v in msg.items():
 		
 		if k in fix42.REPEAT:
 			msg[k] = [json_encode(i) for i in v]
@@ -34,7 +34,7 @@ def json_encode(msg):
 
 def json_decode(msg):
 	new = {}
-	for k, v in msg.iteritems():
+	for k, v in msg.items():
 		
 		if k.startswith('_'):
 			continue

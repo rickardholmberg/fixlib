@@ -69,8 +69,8 @@ class EngineTests(unittest.TestCase):
 		i, a = self.setup()
 		def cond(hook, msg):
 			if hook == 'admin' and msg['MsgType'] == 'Logon':
-				self.assertEquals(msg['SenderCompID'], 'B')
-				self.assertEquals(msg['TargetCompID'], 'A')
+				self.assertEqual(msg['SenderCompID'], 'B')
+				self.assertEqual(msg['TargetCompID'], 'A')
 				a.close()
 				i.close()
 		self.loop(i, a, cond, None)
@@ -79,8 +79,8 @@ class EngineTests(unittest.TestCase):
 		i, a = self.setup()
 		def cond(hook, msg):
 			if hook == 'admin' and msg['MsgType'] == 'Logon':
-				self.assertEquals(msg.get('ResetSeqNumFlag'), True)
-				self.assertEquals(msg['MsgSeqNum'], 1)
+				self.assertEqual(msg.get('ResetSeqNumFlag'), True)
+				self.assertEqual(msg['MsgSeqNum'], 1)
 				a.close()
 				i.close()
 		self.loop(i, a, cond, None, True)

@@ -4,7 +4,7 @@
 # This software is licensed as described in the file LICENSE,
 # which you should have received as part of this distribution.
 
-from __future__ import print_function
+
 from datetime import datetime
 from . import fix42
 
@@ -58,7 +58,7 @@ class Engine(asyncore.dispatcher):
 	def queue(self, msg):
 		
 		if 'MsgSeqNum' not in msg:
-			msg['MsgSeqNum'] = self.next
+			msg['MsgSeqNum'] = self.__next__
 		
 		if 'SendingTime' not in msg:
 			msg['SendingTime'] = datetime.utcnow()
