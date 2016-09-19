@@ -8,8 +8,8 @@ from datetime import datetime, date
 
 import copy
 
-SOH = '\x01'
-PROTO = 'FIX.4.2'
+SOH = b'\x01'
+PROTO = b'FIX.4.2'
 CSMASK = 255
 
 ADMIN = set([
@@ -341,25 +341,26 @@ RTAGS = {
 WTAGS = dict((v[0], (k, v[1])) for (k, v) in RTAGS.items())
 
 def booldecode(x):
-	return {'Y': True, 'N': False}[x]
+	return {b'Y': True, b'N': False}[x]
 
 def boolencode(x):
-	return {True: 'Y', False: 'N'}[x]
+	return {True: b'Y', False: b'N'}[x]
 
 DATEFMT = '%Y%m%d'
 
 def dencode(d):
-	return d.strftime(DATEFMT)
+	return d.strftime(DATEFMT).encode('ascii')
 
 def ddecode(d):
-	return datetime.strptime(d, DATEFMT).date()
+	return datetime.strptime(bytes.decode(d, 'ascii'), DATEFMT).date()
 
 DATETIMEFMT = '%Y%m%d-%H:%M:%S'
 
 def dtencode(dt):
-	return dt.strftime(DATETIMEFMT)
+	return dt.strftime(DATETIMEFMT).encode('ascii')
 
 def dtdecode(dt):
+	dt = bytes.decode(dt, 'ascii')
 	if len(dt) == 17:
 		return datetime.strptime(dt, DATETIMEFMT)
 	base, milli = dt.split('.')
@@ -369,13 +370,13 @@ def dtdecode(dt):
 
 TYPES = {
 	bool: (boolencode, booldecode),
-	str: (str, str),
-	int: (str, int),
-	float: (str, float),
-	int: (str, int),
+	str: (lambda x: x.encode('ascii'), lambda x: x.decode('ascii')),
+	bytes: (bytes, bytes),
+	int: (lambda x: str(x).encode('ascii'), int),
+	float: (lambda x: str(x).encode('ascii'), float),
 	date: (dencode, ddecode),
 	datetime: (dtencode, dtdecode),
-	list: (lambda x: ' '.join(x), lambda x: x.split(' ')),
+	list: (lambda x: ' '.join(x).encode('ascii'), lambda x: x.split(b' ')),
 }
 
 HEADER = [
@@ -421,7 +422,7 @@ def format(k, v):
 		v = v.encode('utf-8')
 	
 	v = TYPES[type(v)][0](v)
-	return '%i=%s' % (WTAGS[k][0], v)
+	return b'%i=%s' % (WTAGS[k][0], v)
 
 def tags(body, k, v):
 	
@@ -461,13 +462,13 @@ def construct(msg):
 	header.append(body)
 	
 	data = SOH.join(header)
-	cs = sum(ord(c) for c in data) & CSMASK
+	cs = sum(c for c in data) & CSMASK
 	return data + format('CheckSum', '%03i' % cs) + SOH
 
 def parse(msg):
 	
 	tags = msg.split(SOH)
-	assert tags[-1] == ''
+	assert tags[-1] == b''
 	tags = tags[:-1]
 	
 	msgs = [{}]
@@ -475,7 +476,7 @@ def parse(msg):
 	cur, grp = msgs[0], None
 	for tag in tags:
 		
-		k, v = tag.split('=', 1)
+		k, v = tag.split(b'=', 1)
 		if int(k) not in RTAGS:
 			raise ValueError(int(k))
 		
@@ -491,7 +492,7 @@ def parse(msg):
 		if k not in RENUMS:
 			pass
 		elif isinstance(v, tuple) or isinstance(v, list):
-			v = v.__class__(RENUMS[k].get(i, i) for i in v)
+			v = v.__class__(RENUMS[k].get(bytes.decode(i, 'ascii') if i.__class__ is bytes else i, i) for i in v)
 		elif v in RENUMS[k]:
 			v = RENUMS[k][v]
 		
